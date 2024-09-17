@@ -1,0 +1,295 @@
+/* General Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif; /* Use a standard font for consistency */
+}
+
+#body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f0f4f8; /* Light professional background color */
+}
+
+/* Main Content Area */
+#main-content {
+  flex: 1;
+  background-image: url('./homebackground.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 20px; /* Add padding for content spacing */
+}
+
+/* Fullscreen Styles */
+.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  background: rgba(0, 0, 0, 0.8); /* Dark overlay for fullscreen */
+}
+
+/* Footer Styles */
+.footer {
+  background: linear-gradient(90deg, #C33764, #1D2671);
+  color: white;
+  padding: 1rem 0;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Page Animation */
+#body {
+  animation: ani 1s ease-in forwards;
+}
+
+@keyframes ani {
+  from {
+    opacity: 0;
+    margin-top: -50px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+/* Slider Section */
+.slider-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem; /* Add margin for spacing */
+}
+
+.slider-slide {
+  position: relative;
+}
+
+.slider-image {
+  width: 100%;
+  height: 900px; /* Increased height for better visibility */
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.slider-caption {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 1rem; /* Adjusted font size for readability */
+}
+
+.slick-dots {
+  bottom: 20px; /* Adjust spacing */
+}
+
+.slick-dots li button:before {
+  color: darkgray; /* Dots color */
+  font-size: 14px; /* Dot size */
+}
+
+.slick-dots li.slick-active button:before {
+  color: black; /* Active dot color */
+}
+
+.slick-prev,
+.slick-next {
+  font-size: 24px;
+  color: #f0f4f8; /* Light color for arrows */
+  z-index: 1000; /* Ensure arrows are on top */
+  width: 50px; /* Increased size */
+  height: 50px; /* Increased size */
+  background-color: #333; /* Dark background */
+  border-radius: 50%; /* Circular buttons */
+  background-size: 60%; /* Arrow size */
+  background-repeat: no-repeat;
+}
+
+.slick-prev {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: url("https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-arrow-left.svg") center center no-repeat;
+}
+
+.slick-next {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: url("https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-arrow-right.svg") center center no-repeat;
+}
+
+/* Home Page Titles */
+.home-title {
+  color: black; /* Dark color for titles */
+  text-align: center; /* Centered titles */
+  font-size: 2rem; /* Font size */
+  font-weight: bold;
+  margin: 1.5rem 0; /* Spacing around titles */
+}
+
+/* Collaborator Cards */
+.collaborator-card {
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.collaborator-card img {
+  height: 150px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 14px;
+}
+
+/* Contact Us Section */
+.contact-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.contact-image {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.contact-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.contact-form {
+  flex: 2;
+  max-width: 600px;
+  margin-left: 20px;
+  background-color: #333; /* Dark color for the form */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Added box-shadow */
+}
+
+.contact-form h2 {
+  margin-bottom: 20px;
+  color: white; /* White color for form title */
+}
+
+.contact-form .form-label {
+  color: #f0f4f8; /* Light color for field names */
+  font-weight: bold;
+}
+
+.contact-form .form-control {
+  margin-bottom: 10px;
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.contact-form .form-control:focus {
+  border-color: #007bff; /* Focus border color */
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Focus shadow */
+}
+
+.contact-form .form-button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.contact-form .form-button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Video Player Section */
+.video-player-container {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  max-width: 100%; /* Ensure video container doesn't exceed viewport */
+}
+
+.video-player {
+  width: 100%;
+  height: 100vh; /* Full viewport height */
+}
+
+.video-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.video-control-button {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  margin: 0 5px;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.fullscreen .video-player-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8); /* Dark overlay for fullscreen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.fullscreen .video-player {
+  width: 80%;
+  height: auto;
+}
+
+.fullscreen .video-controls {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+
+
+
+
