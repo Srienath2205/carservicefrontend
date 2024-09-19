@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -20,87 +20,98 @@ import {
   Paper,
   styled,
   TextField,
-} from '@mui/material';
-import { Visibility, Download, PictureAsPdf, Edit, Delete as DeleteIcon, LocationOn, Phone, Email, Description, DateRange } from '@mui/icons-material';
-import SuperAdminSidebar from './SuperAdminSidebar';
-import homebackground from './homebackground.avif';
-import Swal from 'sweetalert2';
+  MenuItem,
+  Select,
+} from "@mui/material";
+import {
+  Visibility,
+  Download,
+  PictureAsPdf,
+  Edit,
+  Delete as DeleteIcon,
+  LocationOn,
+  Phone,
+  Email,
+  Description,
+  DateRange,
+} from "@mui/icons-material";
+import SuperAdminSidebar from "./SuperAdminSidebar";
+import Swal from "sweetalert2";
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
-    margin: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    maxHeight: 400 ,
-    maxWidth: 400,
-    width: 400,
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: theme.shape.borderRadius,
-    boxShadow: theme.shadows[3],
-  }));
-  
-  const StyledMedia = styled(CardMedia)(({ theme }) => ({
-    height: 250, // Increased height to accommodate larger images
-    width: '100%',
-  }));
-  
-  const ButtonsContainer = styled('div')(({ theme }) => ({
-    marginTop: theme.spacing(2),
-    display: 'flex',
-    justifyContent: 'space-between',
-  }));
-  
-  const CenteredBox = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-  }));
-  
-  const DialogTitleStyled = styled(DialogTitle)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    backgroundColor: '#03045e',
-    color: 'white',
-  }));
-  
-  const drawerWidth = 240;
-  
-  const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
+  margin: theme.spacing(2),
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  maxHeight: 400,
+  maxWidth: 400,
+  width: 400,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[3],
+}));
+
+const StyledMedia = styled(CardMedia)(({ theme }) => ({
+  height: 250,
+  width: "100%",
+}));
+
+const ButtonsContainer = styled("div")(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  display: "flex",
+  justifyContent: "space-between",
+}));
+
+const CenteredBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100%",
+}));
+
+const DialogTitleStyled = styled(DialogTitle)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  fontWeight: "bold",
+  backgroundColor: "#03045e",
+  color: "white",
+}));
+
+const drawerWidth = 240;
+
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
+  ({ theme, open }) => ({
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: -drawerWidth,
+    ...(open && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
       }),
-      marginLeft: -drawerWidth,
-      ...(open && {
-        transition: theme.transitions.create('margin', {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: 0,
-      }),
-    })
-  );
-  
-  const StyledButton = styled(Button)(({ theme }) => ({
-    marginLeft: theme.spacing(2),
-    backgroundColor: '#009688',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#00796b',
-    },
-  }));
-  
-  const UpdateDialog = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialog-paper': {
-      padding: theme.spacing(2),
-      minWidth: '400px',
-    },
-  }));
-  
+      marginLeft: 0,
+    }),
+  })
+);
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  marginLeft: theme.spacing(2),
+  backgroundColor: "#009688",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "#00796b",
+  },
+}));
+
+const UpdateDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    padding: theme.spacing(2),
+    minWidth: "400px",
+  },
+}));
 
 const SuperAdminViewCenters = () => {
   const navigate = useNavigate();
@@ -112,21 +123,34 @@ const SuperAdminViewCenters = () => {
   const [viewFile, setViewFile] = useState(null);
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
   const [formData, setFormData] = useState({});
+  const [locations, setLocations] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState("All");
 
   useEffect(() => {
+    // Fetch approved service centers
     axios
-      .get('http://localhost:8686/servicecenters/getApprovedRequestList')
+      .get("http://localhost:8686/servicecenters/getApprovedRequestList")
       .then((response) => {
         setApprovedCenters(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching approved centers:', error);
+        console.error("Error fetching approved centers:", error);
         Swal.fire({
-          title: 'Error',
-          text: 'There was an error fetching the approved requests!',
-          icon: 'error',
-          confirmButtonText: 'OK',
+          title: "Error",
+          text: "There was an error fetching the approved requests!",
+          icon: "error",
+          confirmButtonText: "OK",
         });
+      });
+
+    // Fetch distinct locations
+    axios
+      .get("http://localhost:8686/servicecenters/locations")
+      .then((response) => {
+        setLocations(["All", ...response.data]); // Add 'All' option for filtering
+      })
+      .catch((error) => {
+        console.error("Error fetching locations:", error);
       });
   }, []);
 
@@ -135,16 +159,16 @@ const SuperAdminViewCenters = () => {
     setFileUrls({
       serviceCenterImage: center.serviceCenterImage
         ? `data:image/jpeg;base64,${center.serviceCenterImage}`
-        : '',
+        : "",
       businessRegistrationCertificate: center.businessRegistrationCertificate
         ? `data:application/pdf;base64,${center.businessRegistrationCertificate}`
-        : '',
+        : "",
       insuranceDocument: center.insuranceDocument
         ? `data:application/pdf;base64,${center.insuranceDocument}`
-        : '',
+        : "",
       ownerIdentityProof: center.ownerIdentityProof
         ? `data:image/jpeg;base64,${center.ownerIdentityProof}`
-        : '',
+        : "",
     });
     setOpenViewMore(true);
   };
@@ -158,7 +182,7 @@ const SuperAdminViewCenters = () => {
   };
 
   const handleDownload = (url, fileName) => {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = fileName;
     link.click();
@@ -182,42 +206,61 @@ const SuperAdminViewCenters = () => {
   const handleUpdateSubmit = () => {
     // Make API call to update center details
     axios
-      .put(`http://localhost:8686/servicecenters/update/${selectedCenter.serviceCenterID}`, formData)
+      .put(
+        `http://localhost:8686/servicecenters/update/${selectedCenter.serviceCenterID}`,
+        formData
+      )
       .then(() => {
-        Swal.fire('Success', 'Service center updated successfully!', 'success');
+        Swal.fire("Success", "Service center updated successfully!", "success");
         setOpenUpdateDialog(false);
         // Refresh the list of centers
-        axios.get('http://localhost:8686/servicecenters/getApprovedRequestList').then((response) => {
-          setApprovedCenters(response.data);
-        });
+        axios
+          .get("http://localhost:8686/servicecenters/getApprovedRequestList")
+          .then((response) => {
+            setApprovedCenters(response.data);
+          });
       })
       .catch((error) => {
-        console.error('Error updating center:', error);
-        Swal.fire('Error', 'There was an error updating the service center!', 'error');
+        console.error("Error updating center:", error);
+        Swal.fire(
+          "Error",
+          "There was an error updating the service center!",
+          "error"
+        );
       });
   };
 
   const handleDelete = (id) => {
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will not be able to recover this service center!',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "You will not be able to recover this service center!",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
         axios
           .delete(`http://localhost:8686/servicecenters/delete/${id}`)
           .then(() => {
-            Swal.fire('Deleted!', 'The service center has been deleted.', 'success');
+            Swal.fire(
+              "Deleted!",
+              "The service center has been deleted.",
+              "success"
+            );
             // Refresh the list of centers
-            setApprovedCenters((prev) => prev.filter((center) => center.serviceCenterID !== id));
+            setApprovedCenters((prev) =>
+              prev.filter((center) => center.serviceCenterID !== id)
+            );
           })
           .catch((error) => {
-            console.error('Error deleting center:', error);
-            Swal.fire('Error', 'There was an error deleting the service center!', 'error');
+            console.error("Error deleting center:", error);
+            Swal.fire(
+              "Error",
+              "There was an error deleting the service center!",
+              "error"
+            );
           });
       }
     });
@@ -225,103 +268,153 @@ const SuperAdminViewCenters = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString(); // Customize format as needed
+    return date.toLocaleDateString();
   };
 
+  // Filter approved centers by location
+  const filteredCenters = approvedCenters.filter((center) => {
+    return selectedLocation === "All" || center.location === selectedLocation;
+  });
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        position: 'relative',
-        height: '100vh',
-        background: `url(${homebackground}) no-repeat center center fixed`,
-        backgroundSize: 'cover',
-      }}
-    >
+    <div style={{ display: "flex", position: "relative", height: "100vh" }}>
       <SuperAdminSidebar open={open} />
-      <Main open={open} style={{ flexGrow: 1, padding: '20px' }}>
+      <Main open={open} style={{ flexGrow: 1, padding: "20px" }}>
         {/* Title Section */}
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '10px 20px',
-            color: '#fff',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            padding: "10px 20px",
+            color: "#fff",
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mb: 4,
-            }}
-          >
-            <Typography variant="h4" fontWeight="bold">
+          <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              sx={{ color: "#03045e" }}
+            >
               View Service Centers
             </Typography>
           </Box>
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              width: '100%',
+              display: "flex",
+              justifyContent: "flex-end",
+              width: "100%",
               mb: 2,
             }}
           >
-            <StyledButton onClick={() => navigate('/centerapproval')}>
+            <StyledButton onClick={() => navigate("/center-approval")}>
               Pending Approvals
             </StyledButton>
+          </Box>
+          {/* Location Filter */}
+          <Box
+            sx={{
+              mb: 2,
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ mb: 1, color: "#03045e" }}>
+              Location Filter
+            </Typography>
+            <Select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              fullWidth
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#03045e", // Initial border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "green", // Border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "green", // Border color when focused
+                    boxShadow: "0 0 5px rgba(0, 128, 0, 0.5)", // Shadow when focused
+                  },
+                },
+                minWidth: 150, // Adjust the width to make it smaller
+                height: 40, // Set a specific height
+              }}
+              startAdornment={
+                <Box sx={{ mr: 1 }}>
+                  <LocationOn sx={{ color: "#03045e" }} />
+                </Box>
+              }
+            >
+              {locations.map((location, index) => (
+                <MenuItem key={index} value={location}>
+                  {location}
+                </MenuItem>
+              ))}
+            </Select>
           </Box>
         </Box>
 
         {/* Cards for Approved Centers */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-          {approvedCenters.map((center) => (
-            <StyledCard key={center.serviceCenterID}>
-              <StyledMedia
-                image={`data:image/jpeg;base64,${center.serviceCenterImage}`}
-                title={center.serviceCenterName}
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h6" component="div">
-                  {center.serviceCenterName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {center.address}
-                </Typography>
-                <ButtonsContainer>
-                  <Tooltip title="View More" arrow>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenViewMore(center)}
-                    >
-                      <Visibility />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Update" arrow>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleUpdateOpen(center)}
-                    >
-                      <Edit />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete" arrow>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(center.serviceCenterID)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </ButtonsContainer>
-              </CardContent>
-            </StyledCard>
-          ))}
-        </Box>
+        {filteredCenters.length === 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "60vh",
+            }}
+          >
+            <Typography variant="h6" color="#03045e">
+              No Service Centers Available
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+            {filteredCenters.map((center) => (
+              <StyledCard key={center.serviceCenterID}>
+                <StyledMedia
+                  image={`data:image/jpeg;base64,${center.serviceCenterImage}`}
+                  title={center.serviceCenterName}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h6" component="div">
+                    {center.serviceCenterName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {center.address}
+                  </Typography>
+                  <ButtonsContainer>
+                    <Tooltip title="View More" arrow>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleOpenViewMore(center)}
+                      >
+                        <Visibility />
+                        View
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete" arrow>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDelete(center.serviceCenterID)}
+                      >
+                        <DeleteIcon />
+                        Delete
+                      </IconButton>
+                    </Tooltip>
+                  </ButtonsContainer>
+                </CardContent>
+              </StyledCard>
+            ))}
+          </Box>
+        )}
 
         {/* View More Dialog */}
         <Dialog
@@ -336,51 +429,68 @@ const SuperAdminViewCenters = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <LocationOn sx={{ color: '#03a9f4' }} /> Service Center Name:
+                    <LocationOn sx={{ color: "#03a9f4" }} /> Service Center
+                    Name:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.serviceCenterName}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.serviceCenterName}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <LocationOn sx={{ color: '#03a9f4' }} /> Address:
+                    <LocationOn sx={{ color: "#03a9f4" }} /> Address:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.address}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.address}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <LocationOn sx={{ color: '#03a9f4' }} /> Location:
+                    <LocationOn sx={{ color: "#03a9f4" }} /> Location:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.location}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.location}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <Description sx={{ color: '#03a9f4' }} /> Description:
+                    <Description sx={{ color: "#03a9f4" }} /> Description:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.description}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.description}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <Phone sx={{ color: '#03a9f4' }} /> Phone Number:
+                    <Phone sx={{ color: "#03a9f4" }} /> Phone Number:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.phoneNumber}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.phoneNumber}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <Email sx={{ color: '#03a9f4' }} /> Email:
+                    <Email sx={{ color: "#03a9f4" }} /> Email:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.email}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.email}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <DateRange sx={{ color: '#03a9f4' }} /> Status:
+                    <DateRange sx={{ color: "#03a9f4" }} /> Status:
                   </Typography>
-                  <Typography variant="body1">{selectedCenter.status}</Typography>
+                  <Typography variant="body1">
+                    {selectedCenter.status}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6">
-                    <DateRange sx={{ color: '#03a9f4' }} /> Approval Date:
+                    <DateRange sx={{ color: "#03a9f4" }} /> Approval Date:
                   </Typography>
-                  <Typography variant="body1">{formatDate(selectedCenter.approvalDate)}</Typography>
+                  <Typography variant="body1">
+                    {formatDate(selectedCenter.approvalDate)}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <DialogContent>
@@ -395,14 +505,24 @@ const SuperAdminViewCenters = () => {
                                   <Typography>Service Center Image</Typography>
                                   <Box display="flex" alignItems="center">
                                     <Button
-                                      onClick={() => handleView(fileUrls.serviceCenterImage, 'image')}
+                                      onClick={() =>
+                                        handleView(
+                                          fileUrls.serviceCenterImage,
+                                          "image"
+                                        )
+                                      }
                                       startIcon={<Visibility />}
                                       variant="contained"
                                     >
                                       View
                                     </Button>
                                     <StyledButton
-                                      onClick={() => handleDownload(fileUrls.serviceCenterImage, 'serviceCenterImage.jpg')}
+                                      onClick={() =>
+                                        handleDownload(
+                                          fileUrls.serviceCenterImage,
+                                          "serviceCenterImage.jpg"
+                                        )
+                                      }
                                       startIcon={<Download />}
                                       variant="contained"
                                     >
@@ -417,17 +537,29 @@ const SuperAdminViewCenters = () => {
                             <Grid item xs={12} md={6}>
                               <CenteredBox>
                                 <Box>
-                                  <Typography>Business Registration Certificate</Typography>
+                                  <Typography>
+                                    Business Registration Certificate
+                                  </Typography>
                                   <Box display="flex" alignItems="center">
                                     <Button
-                                      onClick={() => handleView(fileUrls.businessRegistrationCertificate, 'pdf')}
+                                      onClick={() =>
+                                        handleView(
+                                          fileUrls.businessRegistrationCertificate,
+                                          "pdf"
+                                        )
+                                      }
                                       startIcon={<PictureAsPdf />}
                                       variant="contained"
                                     >
                                       View
                                     </Button>
                                     <StyledButton
-                                      onClick={() => handleDownload(fileUrls.businessRegistrationCertificate, 'businessRegistrationCertificate.pdf')}
+                                      onClick={() =>
+                                        handleDownload(
+                                          fileUrls.businessRegistrationCertificate,
+                                          "businessRegistrationCertificate.pdf"
+                                        )
+                                      }
                                       startIcon={<Download />}
                                       variant="contained"
                                     >
@@ -445,14 +577,24 @@ const SuperAdminViewCenters = () => {
                                   <Typography>Insurance Document</Typography>
                                   <Box display="flex" alignItems="center">
                                     <Button
-                                      onClick={() => handleView(fileUrls.insuranceDocument, 'pdf')}
+                                      onClick={() =>
+                                        handleView(
+                                          fileUrls.insuranceDocument,
+                                          "pdf"
+                                        )
+                                      }
                                       startIcon={<PictureAsPdf />}
                                       variant="contained"
                                     >
                                       View
                                     </Button>
                                     <StyledButton
-                                      onClick={() => handleDownload(fileUrls.insuranceDocument, 'insuranceDocument.pdf')}
+                                      onClick={() =>
+                                        handleDownload(
+                                          fileUrls.insuranceDocument,
+                                          "insuranceDocument.pdf"
+                                        )
+                                      }
                                       startIcon={<Download />}
                                       variant="contained"
                                     >
@@ -470,14 +612,24 @@ const SuperAdminViewCenters = () => {
                                   <Typography>Owner Identity Proof</Typography>
                                   <Box display="flex" alignItems="center">
                                     <Button
-                                      onClick={() => handleView(fileUrls.ownerIdentityProof, 'image')}
+                                      onClick={() =>
+                                        handleView(
+                                          fileUrls.ownerIdentityProof,
+                                          "image"
+                                        )
+                                      }
                                       startIcon={<Visibility />}
                                       variant="contained"
                                     >
                                       View
                                     </Button>
                                     <StyledButton
-                                      onClick={() => handleDownload(fileUrls.ownerIdentityProof, 'ownerIdentityProof.jpg')}
+                                      onClick={() =>
+                                        handleDownload(
+                                          fileUrls.ownerIdentityProof,
+                                          "ownerIdentityProof.jpg"
+                                        )
+                                      }
                                       startIcon={<Download />}
                                       variant="contained"
                                     >
@@ -505,20 +657,25 @@ const SuperAdminViewCenters = () => {
 
         {/* View File Component */}
         {viewFile && (
-          <Dialog open onClose={() => setViewFile(null)} fullWidth maxWidth="md">
+          <Dialog
+            open
+            onClose={() => setViewFile(null)}
+            fullWidth
+            maxWidth="md"
+          >
             <DialogTitleStyled>File Viewer</DialogTitleStyled>
             <DialogContent>
-              {viewFile.type === 'pdf' ? (
+              {viewFile.type === "pdf" ? (
                 <iframe
                   src={viewFile.url}
-                  style={{ width: '100%', height: '80vh' }}
+                  style={{ width: "100%", height: "80vh" }}
                   frameBorder="0"
                 />
               ) : (
                 <img
                   src={viewFile.url}
                   alt="File Preview"
-                  style={{ width: '100%', height: '80vh' }}
+                  style={{ width: "100%", height: "80vh" }}
                 />
               )}
             </DialogContent>
@@ -527,66 +684,6 @@ const SuperAdminViewCenters = () => {
             </DialogActions>
           </Dialog>
         )}
-
-        {/* Update Dialog */}
-        <UpdateDialog
-          open={openUpdateDialog}
-          onClose={handleClose}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitleStyled>Update Service Center</DialogTitleStyled>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Service Center Name"
-                  value={formData.serviceCenterName || ''}
-                  onChange={(e) => setFormData({ ...formData, serviceCenterName: e.target.value })}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Address"
-                  value={formData.address || ''}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Location"
-                  value={formData.location || ''}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Description"
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  margin="normal"
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleUpdateSubmit} color="primary">
-              Update
-            </Button>
-            <Button onClick={handleClose} color="secondary">
-              Cancel
-            </Button>
-          </DialogActions>
-        </UpdateDialog>
       </Main>
     </div>
   );

@@ -207,7 +207,7 @@ const AdminSidebar = ({ open }) => {
           >
             <MenuItem
               component={Link}
-              to="/view-inventory"
+              to="/centerview-inventory"
               onClick={handleCloseInventory}
             >
               <ListItemIcon>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Grid,
@@ -12,7 +12,6 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-// import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AccountCircle,
@@ -38,7 +37,6 @@ import {
   LinearScale,
 } from "chart.js";
 import CustomerSidebar from "./CustomerSideBar";
-import homebackground from "./homebackground.avif"; // Correct import
 
 import developer1 from "./ds1.jpg";
 import developer2 from "./ds2.jpg";
@@ -74,24 +72,91 @@ const GradientButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open }) => ({
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })((
+  { theme, open }
+) => ({
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: `-${drawerWidth}px`,
+  ...(open && {
     transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
-  })
-);
+    marginLeft: 0,
+  }),
+}));
 
 const drawerWidth = 240;
+
+// Define custom arrow components
+const SampleNextArrow = styled("div")({
+  display: "block",
+  width: "30px",
+  height: "30px",
+  background: "#03045e",
+  color: "white",
+  borderRadius: "50%",
+  lineHeight: "30px",
+  textAlign: "center",
+  cursor: "pointer",
+  position: "absolute",
+  top: "50%",
+  right: "10px",
+  transform: "translateY(-50%)",
+  "&::before": {
+    content: '"→"',
+    fontSize: "16px",
+  },
+});
+
+const SamplePrevArrow = styled("div")({
+  display: "block",
+  width: "30px",
+  height: "30px",
+  background: "#03045e",
+  color: "white",
+  borderRadius: "50%",
+  lineHeight: "30px",
+  textAlign: "center",
+  cursor: "pointer",
+  position: "absolute",
+  top: "50%",
+  left: "10px",
+  transform: "translateY(-50%)",
+  "&::before": {
+    content: '"←"',
+    fontSize: "16px",
+  },
+});
+
+const sliderSettings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  nextArrow: <SampleNextArrow />,
+  prevArrow: <SamplePrevArrow />,
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 2,
+        slidesToScroll: 1,
+      },
+    },
+    {
+      breakpoint: 600,
+      settings: {
+        slidesToShow: 1,
+        slidesToScroll: 1,
+      },
+    },
+  ],
+};
 
 const serviceAppointmentsChartData = {
   labels: ["Pending", "Approved", "Completed", "Canceled"],
@@ -116,30 +181,6 @@ const serviceHistoryLineChartData = {
   ],
 };
 
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 2,
-        slidesToScroll: 1,
-      },
-    },
-    {
-      breakpoint: 600,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-      },
-    },
-  ],
-};
-
 const developers = [
   { name: "Shinobu", role: "Frontend Developer", image: developer1 },
   { name: "Nezuko", role: "Backend Developer", image: developer2 },
@@ -153,25 +194,7 @@ const CustomerDashboard = () => {
   const [open, setOpen] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  //   const [customerName, setCustomerName] = useState("");
   const navigate = useNavigate();
-
-  //   const fetchCustomerName = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         "http://localhost:8787/customer/email"
-  //       );
-  //       const email = response.data.email;
-  //       const name = email.split("@")[0];
-  //       setCustomerName(name);
-  //     } catch (error) {
-  //       console.error("Error fetching customer name:", error);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     fetchCustomerName();
-  //   }, []);
 
   const handleProfileClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -198,9 +221,7 @@ const CustomerDashboard = () => {
       style={{
         display: "flex",
         position: "relative",
-        height: "140vh",
-        background: `url(${homebackground}) no-repeat center center fixed`,
-        backgroundSize: "cover",
+        height: "100vh",
       }}
     >
       <CustomerSidebar open={open} handleDrawerClose={() => setOpen(false)} />
@@ -209,7 +230,7 @@ const CustomerDashboard = () => {
         {/* Title Section */}
         <div
           style={{
-            color: "#fff",
+            color: "#03045e",
             padding: "10px 20px",
             marginBottom: "20px",
             textAlign: "center",
@@ -232,7 +253,7 @@ const CustomerDashboard = () => {
                     component="div"
                     style={{
                       fontWeight: "bold",
-                      color: "#03045e", // Changed color to white
+                      color: "#03045e",
                       textAlign: "center",
                     }}
                   >
@@ -257,7 +278,7 @@ const CustomerDashboard = () => {
                     component="div"
                     style={{
                       fontWeight: "bold",
-                      color: "#03045e", // Changed color to white
+                      color: "#03045e",
                       textAlign: "center",
                     }}
                   >
@@ -283,7 +304,7 @@ const CustomerDashboard = () => {
                   fontFamily: "verdana",
                   fontWeight: "bold",
                   fontStyle: "italic",
-                  color: "#fff", // Changed color to white
+                  color: "#03045e",
                 }}
               >
                 Customer Home
@@ -296,7 +317,7 @@ const CustomerDashboard = () => {
                   fontSize: "25px",
                   fontStyle: "italic",
                   textDecoration: "none",
-                  color: "#fff", // Changed color to white
+                  color: "#03045e",
                 }}
               >
                 Welcome to your account.
@@ -308,7 +329,7 @@ const CustomerDashboard = () => {
                   fontSize: "25px",
                   fontStyle: "italic",
                   textDecoration: "none",
-                  color: "#fff", // Changed color to white
+                  color: "#03045e",
                 }}
               >
                 Manage your vehicle details, Book appointments, and track
@@ -349,13 +370,11 @@ const CustomerDashboard = () => {
                 style={{
                   marginBottom: "10px",
                   fontWeight: "bold",
-                  color: "#fff",
+                  color: "#03045e",
                   textAlign: "center",
                 }}
               >
-                <People
-                  style={{ verticalAlign: "middle", marginRight: "8px" }}
-                />
+                <People style={{ verticalAlign: "middle", marginRight: "8px" }} />
                 Meet the Team
               </Typography>
               <Slider {...sliderSettings} className="team-slider">
@@ -372,7 +391,7 @@ const CustomerDashboard = () => {
                       style={{
                         marginTop: "10px",
                         fontWeight: "bold",
-                        color: "#fff",
+                        color: "#03045e",
                       }}
                     >
                       {developer.name}
@@ -380,7 +399,7 @@ const CustomerDashboard = () => {
                     <Typography
                       variant="body2"
                       component="div"
-                      style={{ color: "#fff" }}
+                      style={{ color: "#03045e" }}
                     >
                       {developer.role}
                     </Typography>
@@ -405,12 +424,6 @@ const CustomerDashboard = () => {
               <AccountCircle />
             </Avatar>
           </IconButton>
-          {/* <Typography
-            variant="caption"
-            style={{ color: "#fff", marginTop: "5px" }}
-          >
-            {customerName}
-          </Typography> */}
           <Menu
             anchorEl={anchorEl}
             open={profileMenuOpen}
@@ -444,17 +457,21 @@ const CustomerDashboard = () => {
           </Menu>
         </div>
       </Main>
-      {/* Custom styles for slider dots */}
+
+      {/* Custom styles for slider arrows and dots */}
       <style>
         {`
+          .team-slider .slick-prev, .team-slider .slick-next {
+            color: #03045e; /* Arrow color */
+          }
           .team-slider .slick-dots li button:before {
-            color: white; /* Default color */
+            color: #03045e; /* Default dot color */
           }
           .team-slider .slick-dots li.slick-active button:before {
-            color: white; /* Active dot color */
+            color: #03045e; /* Active dot color */
           }
           .team-slider .slick-dots li button:hover:before {
-            color: white; /* Hover color */
+            color: #03045e; /* Hover dot color */
           }
         `}
       </style>
@@ -463,3 +480,5 @@ const CustomerDashboard = () => {
 };
 
 export default CustomerDashboard;
+
+

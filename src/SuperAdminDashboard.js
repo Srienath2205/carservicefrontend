@@ -13,18 +13,18 @@ import {
   Divider,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AccountCircle,
   Dashboard,
   Store,
+  People,
   AddShoppingCart,
   ExitToApp,
 } from "@mui/icons-material";
 import Slider from "react-slick";
 import { Bar, Pie } from "react-chartjs-2";
 import ChartJS from "chart.js/auto";
-import homebackground from "./homebackground.avif";
 import developer1 from "./ds1.jpg";
 import developer2 from "./ds2.jpg";
 import developer3 from "./ds3.jpg";
@@ -50,14 +50,6 @@ const GradientButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const CancelButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "#f44336",
-  color: "#fff",
-  "&:hover": {
-    backgroundColor: "#c62828",
-  },
-}));
-
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     transition: theme.transitions.create("margin", {
@@ -76,6 +68,73 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
 );
 
 const drawerWidth = 240;
+
+// Define custom arrow components
+const SampleNextArrow = styled("div")({
+  display: "block",
+  width: "30px",
+  height: "30px",
+  background: "#03045e",
+  color: "white",
+  borderRadius: "50%",
+  lineHeight: "30px",
+  textAlign: "center",
+  cursor: "pointer",
+  position: "absolute",
+  top: "50%",
+  right: "10px",
+  transform: "translateY(-50%)",
+  "&::before": {
+    content: '"→"',
+    fontSize: "16px",
+  },
+});
+
+const SamplePrevArrow = styled("div")({
+  display: "block",
+  width: "30px",
+  height: "30px",
+  background: "#03045e",
+  color: "white",
+  borderRadius: "50%",
+  lineHeight: "30px",
+  textAlign: "center",
+  cursor: "pointer",
+  position: "absolute",
+  top: "50%",
+  left: "10px",
+  transform: "translateY(-50%)",
+  "&::before": {
+    content: '"←"',
+    fontSize: "16px",
+  },
+});
+
+const sliderSettings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  nextArrow: <SampleNextArrow />,
+  prevArrow: <SamplePrevArrow />,
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 2,
+        slidesToScroll: 1,
+      },
+    },
+    {
+      breakpoint: 600,
+      settings: {
+        slidesToShow: 1,
+        slidesToScroll: 1,
+      },
+    },
+  ],
+};
 
 // Sample data for the charts
 const inventoryRequestsData = {
@@ -111,29 +170,6 @@ const serviceCenterRegistrationsData = {
   ],
 };
 
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 2,
-        slidesToScroll: 1,
-      },
-    },
-    {
-      breakpoint: 600,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-      },
-    },
-  ],
-};
 
 const developers = [
   { name: "Shinobu", role: "Frontend Developer", image: developer1 },
@@ -176,8 +212,6 @@ const SuperAdminDashboard = () => {
         display: "flex",
         position: "relative",
         height: "140vh",
-        background: `url(${homebackground}) no-repeat center center fixed`,
-        backgroundSize: "cover",
       }}
     >
       <SuperAdminSidebar open={open} handleDrawerClose={() => setOpen(false)} />
@@ -186,7 +220,7 @@ const SuperAdminDashboard = () => {
         {/* Title Section */}
         <div
           style={{
-            color: "#fff",
+            color: "#03045e", // Updated text color
             padding: "10px 20px",
             marginBottom: "20px",
             textAlign: "center",
@@ -202,14 +236,14 @@ const SuperAdminDashboard = () => {
           <Grid container spacing={3}>
             {/* Inventory Requests Pie Chart */}
             <Grid item xs={12} md={4}>
-              <Card style={{ marginBottom: "20px" }}>
+              <Card style={{ marginBottom: "20px", backgroundColor: "#fff" }}>
                 <CardContent>
                   <Typography
                     variant="h6"
                     component="div"
                     style={{
                       fontWeight: "bold",
-                      color: "#03045e",
+                      color: "#03045e", // Updated text color
                       textAlign: "center",
                     }}
                   >
@@ -227,14 +261,14 @@ const SuperAdminDashboard = () => {
 
             {/* Inventory Parts and Quantity Bar Chart */}
             <Grid item xs={12} md={4}>
-              <Card style={{ marginBottom: "20px" }}>
+              <Card style={{ marginBottom: "20px", backgroundColor: "#fff" }}>
                 <CardContent>
                   <Typography
                     variant="h6"
                     component="div"
                     style={{
                       fontWeight: "bold",
-                      color: "#03045e",
+                      color: "#03045e", // Updated text color
                       textAlign: "center",
                     }}
                   >
@@ -252,14 +286,14 @@ const SuperAdminDashboard = () => {
 
             {/* Service Center Registrations Chart */}
             <Grid item xs={12} md={4}>
-              <Card style={{ marginBottom: "20px" }}>
+              <Card style={{ marginBottom: "20px", backgroundColor: "#fff" }}>
                 <CardContent>
                   <Typography
                     variant="h6"
                     component="div"
                     style={{
                       fontWeight: "bold",
-                      color: "#03045e",
+                      color: "#03045e", // Updated text color
                       textAlign: "center",
                     }}
                   >
@@ -275,41 +309,128 @@ const SuperAdminDashboard = () => {
               </Card>
             </Grid>
           </Grid>
+        </Container>
 
-          {/* Developer Team Slider */}
-          <Divider style={{ margin: "30px 0" }} />
-          <Typography
-            variant="h6"
-            component="div"
-            style={{
-              fontWeight: "bold",
-              color: "white",
-              textAlign: "center",
-            }}
-          >
-            Meet the Team
-          </Typography>
-          <Slider {...sliderSettings} className="team-slider">
-            {developers.map((dev) => (
-              <div key={dev.name} style={{ textAlign: "center", padding: "10px" }}>
-                <Avatar
-                  src={dev.image}
-                  alt={dev.name}
-                  style={{ width: "100px", height: "100px", margin: "auto" }}
-                />
-                <Typography variant="subtitle1" style={{ marginTop: "10px", color: "white" }}>
-                  {dev.name}
-                </Typography>
-                <Typography variant="body2" style={{ color: "white" }}>
-                  {dev.role}
-                </Typography>
-              </div>
-            ))}
-          </Slider>
+        <Container>
+          <div className="text-block">
+            <center>
+              <h1
+                style={{
+                  marginTop: "50px",
+                  fontSize: "25px",
+                  fontFamily: "verdana",
+                  fontWeight: "bold",
+                  fontStyle: "italic",
+                  color: "#03045e", // Updated text color
+                }}
+              >
+                Super Admin Home
+              </h1>
+            </center>
+            <br />
+            <center>
+              <p
+                style={{
+                  fontSize: "25px",
+                  fontStyle: "italic",
+                  textDecoration: "none",
+                  color: "#03045e", // Updated text color
+                }}
+              >
+                Welcome to the WareHouse panel.
+              </p>
+            </center>
+            <center>
+              <p
+                style={{
+                  fontSize: "25px",
+                  fontStyle: "italic",
+                  textDecoration: "none",
+                  color: "#03045e", // Updated text color
+                }}
+              >
+                Manage service centers, track appointments, and view service
+                history.
+              </p>
+            </center>
+            <center>
+              <GradientButton
+                component={Link}
+                to="/view-inventory"
+                style={{ margin: "10px" }}
+              >
+                Inventory
+              </GradientButton>
+              <GradientButton
+                component={Link}
+                to="/superadmin-viewcenters"
+                style={{ margin: "10px" }}
+              >
+                ServiceCenters
+              </GradientButton>
+              <GradientButton
+                component={Link}
+                to="/view-restock"
+                style={{ margin: "10px" }}
+              >
+                Restock
+              </GradientButton>
+            </center>
+          </div>
+
+          {/* Developer Slider */}
+          <Grid container spacing={3} style={{ marginTop: "40px" }}>
+            <Grid item xs={12}>
+              <Typography
+                variant="h6"
+                component="div"
+                style={{
+                  marginBottom: "10px",
+                  fontWeight: "bold",
+                  color: "#03045e",
+                  textAlign: "center",
+                }}
+              >
+                <People style={{ verticalAlign: "middle", marginRight: "8px" }} />
+                Meet the Team
+              </Typography>
+              <Slider {...sliderSettings} className="team-slider">
+                {developers.map((developer, index) => (
+                  <div key={index} style={{ textAlign: "center" }}>
+                    <Avatar
+                      src={developer.image}
+                      alt={developer.name}
+                      style={{ width: 100, height: 100, margin: "0 auto" }}
+                    />
+                    <Typography
+                      variant="body1"
+                      component="div"
+                      style={{
+                        marginTop: "10px",
+                        fontWeight: "bold",
+                        color: "#03045e",
+                      }}
+                    >
+                      {developer.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      style={{ color: "#03045e" }}
+                    >
+                      {developer.role}
+                    </Typography>
+                  </div>
+                ))}
+              </Slider>
+            </Grid>
+          </Grid>
         </Container>
 
         {/* Profile Icon Badge */}
-        <div style={{ position: "fixed", top: 20, right: 20, textAlign: "center" }}>
+        <div
+          style={{ position: "fixed", top: 20, right: 20, textAlign: "center" }}
+        >
           <IconButton
             onClick={handleProfileClick}
             style={{
@@ -340,7 +461,9 @@ const SuperAdminDashboard = () => {
               View Profile
             </MenuItem>
             <MenuItem
-              onClick={() => handleProfileMenuItemClick("/edit-superadminprofile")}
+              onClick={() =>
+                handleProfileMenuItemClick("/edit-superadminprofile")
+              }
               style={{ color: "#fff" }}
             >
               <AccountCircle style={{ marginRight: "10px" }} />
@@ -353,17 +476,20 @@ const SuperAdminDashboard = () => {
           </Menu>
         </div>
       </Main>
-      {/* Custom styles for slider dots */}
+      {/* Custom styles for slider arrows and dots */}
       <style>
         {`
+          .team-slider .slick-prev, .team-slider .slick-next {
+            color: #03045e; /* Arrow color */
+          }
           .team-slider .slick-dots li button:before {
-            color: white; /* Default color */
+            color: #03045e; /* Default dot color */
           }
           .team-slider .slick-dots li.slick-active button:before {
-            color: white; /* Active dot color */
+            color: #03045e; /* Active dot color */
           }
           .team-slider .slick-dots li button:hover:before {
-            color: white; /* Hover color */
+            color: #03045e; /* Hover dot color */
           }
         `}
       </style>

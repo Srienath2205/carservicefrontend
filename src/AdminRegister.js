@@ -31,7 +31,7 @@ export default function AdminRegister() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (validateValues(inputData)) {
       try {
         const response = await axios.post(
@@ -43,7 +43,7 @@ export default function AdminRegister() {
             },
           }
         );
-  
+
         if (response.status === 200) {
           Swal.fire({
             icon: "success",
@@ -61,10 +61,11 @@ export default function AdminRegister() {
             navigate("/admin-login");
           });
         } else if (response.status === 400) {
+          // Assuming the backend sends the error message in response data
           Swal.fire({
             icon: "error",
             title: "Registration Failed",
-            text: response.data,
+            text: response.data, // Display error message from backend
           });
         } else {
           Swal.fire({
@@ -78,12 +79,11 @@ export default function AdminRegister() {
         Swal.fire({
           icon: "error",
           title: "Registration Error",
-          text: "An error occurred while registering. Please try again later.",
+          text: err.response?.data || "An error occurred while registering. Please try again later.",
         });
       }
     }
   };
-  
 
   const validateValues = (inputData) => {
     const { username, email, password, phoneNumber } = inputData;

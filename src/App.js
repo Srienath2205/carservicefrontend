@@ -8,7 +8,7 @@ import CustomerLogin from "./CustomerLogin";
 import CustomerDashboard from "./CustomerDashboard";
 import Vehicle from "./Vehicle";
 import ViewVehicle from "./ViewVehicle";
-// import CustomerViewProfile from "./CustomerViewProfile";
+import CustomerViewProfile from "./CustomerViewProfile";
 // import CustomerEditProfile from "./CustomerEditProfile";
 
 import AdminRegister from "./AdminRegister";
@@ -16,7 +16,7 @@ import AdminLogin from "./AdminLogin";
 import AdminDashboard from "./AdminDashboard";
 import RegisterServiceCenter from "./RegisterServiceCenter";
 import ViewServiceCenterStatus from "./ViewServiceCenterStatus";
-// import AdminViewProfile from "./AdminViewProfile";
+import AdminViewProfile from "./AdminViewProfile";
 // import AdminEditProfile from "./AdminEditProfile";
 
 import SuperAdminLogin from "./SuperAdminLogin";
@@ -25,10 +25,15 @@ import CenterApproval from "./CenterApproval";
 import ApprovedRequest from "./ApprovedRequest";
 import RejectedRequest from "./RejectedRequest";
 import SuperAdminViewCenters from "./SuperAdminViewCenters";
-// import SuperAdminViewProfile from "./SuperAdminViewProfile";
+import SuperAdminViewProfile from "./SuperAdminViewProfile";
 // import SuperAdminEditProfile from "./SuperAdminEditProfile";
 
 import "./index.css";
+import CustomerViewCenters from "./CustomerViewCenters";
+import BookAppointment from "./BookAppointment";
+import InventoryManagement from "./InventoryManagement";
+import CenterInventoryManagement from "./CenterInventoryManagement";
+import AddInventory from "./AddInventory";
 
 function App() {
   return (
@@ -44,9 +49,10 @@ function App() {
           <Route path="/approvedrequest" element={<ApprovedRequest />} />
           <Route path="/rejectedrequest" element={<RejectedRequest />} />
           <Route path="/superadmin-viewcenters" element={<SuperAdminViewCenters />} />
-
-          {/* <Route path="/view-superadmin" element={<SuperAdminViewProfile />} />
-          <Route path="/edit-superadmin" element={<SuperAdminEditProfile />} /> */}
+          <Route path="/superadmin-profile" element={<SuperAdminViewProfile />} />
+          <Route path="/view-inventory" element={<InventoryManagement/>}/>
+          <Route path="/add-inventory" element={<AddInventory/>}/>
+          {/* <Route path="/edit-superadminprofile" element={<SuperAdminEditProfile />} /> */}
          
           {/* Admin Side */}
           <Route path="/admin-register" element={<AdminRegister />} />
@@ -54,8 +60,9 @@ function App() {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/register-service-center" element={<RegisterServiceCenter />} />
           <Route path="/view-servicecenterstatus" element={<ViewServiceCenterStatus />} />
-          {/* <Route path="/view-admin" element={<AdminViewProfile />} />
-          <Route path="/edit-admin" element={<AdminEditProfile />} /> */}
+          <Route path="/centerview-inventory" element={<CenterInventoryManagement/>}/>
+          <Route path="/admin-profile" element={<AdminViewProfile />} />
+          {/* <Route path="/edit-admin" element={<AdminEditProfile />} /> */}
          
           {/* Customer Side */}
           <Route path="/customer-register" element={<CustomerRegister />} />
@@ -63,8 +70,10 @@ function App() {
           <Route path="/customer-dashboard" element={<CustomerDashboard />} />
           <Route path="/vehicle" element={<Vehicle />} />
           <Route path="/view-vehicle" element={<ViewVehicle />} />
-          {/* <Route path="/cusprofile" element={<CustomerViewProfile />} />
-          <Route path="/edit-cusprofile" element={<CustomerEditProfile />} /> */}
+          <Route path="/service-centers" element={<CustomerViewCenters />} />
+          <Route path="/bookappointment" element={<BookAppointment />} />
+          <Route path="/cusprofile" element={<CustomerViewProfile />} />
+          {/* <Route path="/edit-cusprofile" element={<CustomerEditProfile />} /> */}
           
         </Routes>
       </div>

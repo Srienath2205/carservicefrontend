@@ -245,9 +245,7 @@ const CenterApproval = () => {
       style={{
         display: 'flex',
         position: 'relative',
-        height: '140vh',
-        background: `url(${homebackground}) no-repeat center center fixed`,
-        backgroundSize: 'cover',
+        height: '100vh',
       }}
     >
       <SuperAdminSidebar open={open} />
@@ -259,7 +257,7 @@ const CenterApproval = () => {
             flexDirection: 'column',
             alignItems: 'center',
             padding: '10px 20px',
-            color: '#fff',
+            color: '#03045e', // Updated color
           }}
         >
           <Box
@@ -269,7 +267,7 @@ const CenterApproval = () => {
               mb: 4, // Margin bottom to space buttons from the title
             }}
           >
-            <Dashboard sx={{ verticalAlign: 'middle', mr: 1 }} />
+            <Dashboard sx={{ verticalAlign: 'middle', mr: 1, color: '#03045e' }} />
             <Typography variant="h4" fontWeight="bold">
               Center Approval
             </Typography>
@@ -291,62 +289,66 @@ const CenterApproval = () => {
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex' }}>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Name</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Address</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Description</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Location</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Status</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Approval Date</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Rating</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Email</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Phone Number</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>View</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Actions</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {serviceCenters.map((center) => (
-                  <StyledTableRow key={center.serviceCenterID}>
-                    <StyledTableCell>{center.serviceCenterName}</StyledTableCell>
-                    <StyledTableCell>{center.address}</StyledTableCell>
-                    <StyledTableCell>{center.description}</StyledTableCell>
-                    <StyledTableCell>{center.location}</StyledTableCell>
-                    <StyledTableCell>{center.status}</StyledTableCell>
-                    <StyledTableCell>{center.approvalDate ? new Date(center.approvalDate).toLocaleDateString() : 'N/A'}</StyledTableCell>
-                    <StyledTableCell>{center.rating}</StyledTableCell>
-                    <StyledTableCell>{center.email}</StyledTableCell>
-                    <StyledTableCell>{center.phoneNumber}</StyledTableCell>
-                    <StyledTableCell>
-                      <Tooltip title="View Files">
-                        <IconButton onClick={() => handleOpenViewFiles(center)}>
-                          <Visibility />
-                        </IconButton>
-                      </Tooltip>
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <Button
-                        className="btn btn-success"
-                        onClick={() => handleApprove(center.serviceCenterID)}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        className="btn btn-danger ms-2"
-                        onClick={() => handleReject(center.serviceCenterID)}
-                      >
-                        Reject
-                      </Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          {serviceCenters.length === 0 ? (
+            <Typography variant="h6" align="center" color="#03045e">
+              No Pending Approvals Available
+            </Typography>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Name</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Address</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Description</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Location</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Status</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Approval Date</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Email</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Phone Number</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>View</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Actions</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {serviceCenters.map((center) => (
+                    <StyledTableRow key={center.serviceCenterID}>
+                      <StyledTableCell>{center.serviceCenterName}</StyledTableCell>
+                      <StyledTableCell>{center.address}</StyledTableCell>
+                      <StyledTableCell>{center.description}</StyledTableCell>
+                      <StyledTableCell>{center.location}</StyledTableCell>
+                      <StyledTableCell>{center.status}</StyledTableCell>
+                      <StyledTableCell>{center.approvalDate ? new Date(center.approvalDate).toLocaleDateString() : 'N/A'}</StyledTableCell>
+                      <StyledTableCell>{center.email}</StyledTableCell>
+                      <StyledTableCell>{center.phoneNumber}</StyledTableCell>
+                      <StyledTableCell>
+                        <Tooltip title="View Files">
+                          <IconButton onClick={() => handleOpenViewFiles(center)}>
+                            <Visibility />
+                          </IconButton>
+                        </Tooltip>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Button
+                          className="btn btn-success"
+                          onClick={() => handleApprove(center.serviceCenterID)}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          className="btn btn-danger ms-2"
+                          onClick={() => handleReject(center.serviceCenterID)}
+                        >
+                          Reject
+                        </Button>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
 
           {/* View File Dialog */}
           <Dialog open={openViewFiles} onClose={handleClose} maxWidth="md" fullWidth>
@@ -360,7 +362,7 @@ const CenterApproval = () => {
                       <Grid item xs={12} md={6}>
                         <CenteredBox>
                           <Box>
-                            <Typography>Service Center Image</Typography>
+                            <Typography color="#03045e">Service Center Image</Typography> {/* Updated color */}
                             <Box display="flex" alignItems="center">
                               <Button
                                 onClick={() => handleView(fileUrls.serviceCenterImage, 'image')}
@@ -385,7 +387,7 @@ const CenterApproval = () => {
                       <Grid item xs={12} md={6}>
                         <CenteredBox>
                           <Box>
-                            <Typography>Business Registration Certificate</Typography>
+                            <Typography color="#03045e">Business Registration Certificate</Typography> {/* Updated color */}
                             <Box display="flex" alignItems="center">
                               <Button
                                 onClick={() => handleView(fileUrls.businessRegistrationCertificate, 'pdf')}
@@ -410,7 +412,7 @@ const CenterApproval = () => {
                       <Grid item xs={12} md={6}>
                         <CenteredBox>
                           <Box>
-                            <Typography>Insurance Document</Typography>
+                            <Typography color="#03045e">Insurance Document</Typography> {/* Updated color */}
                             <Box display="flex" alignItems="center">
                               <Button
                                 onClick={() => handleView(fileUrls.insuranceDocument, 'pdf')}
@@ -435,7 +437,7 @@ const CenterApproval = () => {
                       <Grid item xs={12} md={6}>
                         <CenteredBox>
                           <Box>
-                            <Typography>Owner Identity Proof</Typography>
+                            <Typography color="#03045e">Owner Identity Proof</Typography> {/* Updated color */}
                             <Box display="flex" alignItems="center">
                               <Button
                                 onClick={() => handleView(fileUrls.ownerIdentityProof, 'image')}
@@ -496,3 +498,5 @@ const CenterApproval = () => {
 };
 
 export default CenterApproval;
+
+

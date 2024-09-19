@@ -5,7 +5,7 @@ import axios from "axios";
 import CustomerSideBar from "./CustomerSideBar";
 import { styled } from "@mui/material/styles";
 import { Box, Typography, Card, CardContent, CardMedia, IconButton, Tooltip } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon, Info as InfoIcon } from "@mui/icons-material";
+import { Delete as DeleteIcon, Info as InfoIcon } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -56,60 +56,64 @@ function ViewVehicle() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showCertificateModal, setShowCertificateModal] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [username, setUsername] = useState("");
-  const [certificateType, setCertificateType] = useState(""); // New state for certificate type
+  const [certificateType, setCertificateType] = useState("");
   const navigate = useNavigate();
 
-  // Get customer ID from session storage
   const customerID = sessionStorage.getItem("customerID");
 
   useEffect(() => {
     if (customerID) {
-      // Fetch customer details
+      // Fetch vehicles and filter by customerID
       axios
-        .get(`http://localhost:8686/customer/${customerID}`)
-        .then((response) => setUsername(response.data.username))
+        .get("http://localhost:8686/vehicle/all")
+        .then((response) => {
+          const filteredVehicles = response.data.filter(vehicle => vehicle.customerID == customerID);
+          setVehicles(filteredVehicles);
+          setError("");
+        })
         .catch((error) => {
-          console.error(error);
-          setError("Failed to load customer details.");
+          console.error('Error fetching vehicles:', error.response ? error.response.data : error.message);
+          setVehicles([]);
+          setError("Failed to load vehicles.");
         });
     }
-
-    // Fetch vehicles
-    axios
-      .get("http://localhost:8686/vehicle/all")
-      .then((response) => setVehicles(response.data))
-      .catch((error) => {
-        console.error(error);
-        setError("Failed to load vehicles.");
-      });
   }, [customerID]);
 
   const handleViewInfo = (vehicle) => {
     setSelectedVehicle(vehicle);
-    setCertificateType(vehicle.registrationCertificateType);
+    setCertificateType(vehicle.registrationCertificateType || "");
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedVehicle(null);
-    setCertificateType(""); 
+    setCertificateType("");
   };
 
   const handleDelete = (id) => {
-    axios
-      .delete(`http://localhost:8686/vehicle/delete/${id}`)
-      .then(() => {
-        setVehicles(vehicles.filter((vehicle) => vehicle.id !== id));
-        setError("");
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("Failed to delete vehicle.");
-      });
+    setShowDeleteConfirmModal(true);
+    setSelectedVehicle(vehicles.find(vehicle => vehicle.vehicleID === id));
+  };
+
+  const confirmDelete = () => {
+    if (selectedVehicle) {
+      axios
+        .delete(`http://localhost:8686/vehicle/delete/${selectedVehicle.vehicleID}`)
+        .then(() => {
+          setVehicles(vehicles.filter((vehicle) => vehicle.vehicleID !== selectedVehicle.vehicleID));
+          setError("");
+          setShowDeleteConfirmModal(false);
+          setSelectedVehicle(null);
+        })
+        .catch((error) => {
+          console.error('Error deleting vehicle:', error.response ? error.response.data : error.message);
+          setError("Failed to delete vehicle.");
+        });
+    }
   };
 
   const handleViewCertificate = () => {
@@ -121,7 +125,7 @@ function ViewVehicle() {
   };
 
   const handleAddVehicle = () => {
-    navigate("/vehicle"); // Adjust the path as needed
+    navigate("/vehicle");
   };
 
   return (
@@ -131,15 +135,12 @@ function ViewVehicle() {
         <Container>
           <Row className="mb-4 align-items-center">
             <Col>
-              <Typography
-                variant="h4"
-                sx={{ mt: 4, mb: 2, fontWeight: 'bold', fontStyle: 'italic',textAlign: 'center'}}
-              >
+              <Typography variant="h4" sx={{ mt: 4, mb: 2, fontWeight: 'bold', fontStyle: 'italic', textAlign: 'center' }}>
                 Available Vehicles
               </Typography>
             </Col>
-            </Row>
-            <Row>
+          </Row>
+          <Row>
             <Col className="text-end">
               <GradientButton onClick={handleAddVehicle}>
                 Add Vehicle
@@ -147,54 +148,55 @@ function ViewVehicle() {
             </Col>
           </Row>
 
-          {error && <div className="error-message mb-4">{error}</div>}
+          {error && vehicles.length === 0 && (
+            <div className="error-message mb-4">{error}</div>
+          )}
 
-          <Row>
-            {vehicles.length === 0 ? (
+          {vehicles.length === 0 && !error && (
+            <Row>
               <Col>
                 <center>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: 'bold', fontStyle: 'italic' }}
-                  >
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', fontStyle: 'italic' }}>
                     No vehicles available.
                   </Typography>
                 </center>
               </Col>
-            ) : (
-              vehicles.map((vehicle) => (
-                <Col xs={12} sm={6} md={4} key={vehicle.id} className="mb-4">
-                  <VehicleCard>
-                    {vehicle.vehicleImage && (
-                      <VehicleImage
-                        image={`data:image/jpeg;base64,${vehicle.vehicleImage}`}
-                        title={`${vehicle.make} ${vehicle.model}`}
-                      />
-                    )}
-                    <CardContent>
-                      <Typography variant="h6" component="div" gutterBottom>
-                        {vehicle.make} {vehicle.model}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        <strong>Year:</strong> {vehicle.year}
-                      </Typography>
-                    </CardContent>
-                    <VehicleActions>
-                      <Tooltip title="View Info">
-                        <IconButton color="primary" onClick={() => handleViewInfo(vehicle)}>
-                          <InfoIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton color="error" onClick={() => handleDelete(vehicle.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </VehicleActions>
-                  </VehicleCard>
-                </Col>
-              ))
-            )}
+            </Row>
+          )}
+
+          <Row>
+            {vehicles.map((vehicle) => (
+              <Col xs={12} sm={6} md={4} key={vehicle.vehicleID} className="mb-4">
+                <VehicleCard>
+                  {vehicle.vehicleImage && (
+                    <VehicleImage
+                      image={`data:image/jpeg;base64,${vehicle.vehicleImage}`}
+                      title={`${vehicle.make} ${vehicle.model}`}
+                    />
+                  )}
+                  <CardContent>
+                    <Typography variant="h6" component="div" gutterBottom>
+                      {vehicle.make} {vehicle.model}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Year:</strong> {vehicle.year}
+                    </Typography>
+                  </CardContent>
+                  <VehicleActions>
+                    <Tooltip title="View Info">
+                      <IconButton color="primary" onClick={() => handleViewInfo(vehicle)}>
+                        <InfoIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton color="error" onClick={() => handleDelete(vehicle.vehicleID)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </VehicleActions>
+                </VehicleCard>
+              </Col>
+            ))}
           </Row>
         </Container>
 
@@ -263,12 +265,27 @@ function ViewVehicle() {
             </Modal.Footer>
           </Modal>
         )}
+
+        {/* Confirmation Modal for Delete */}
+        <Modal show={showDeleteConfirmModal} onHide={() => setShowDeleteConfirmModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Are you sure you want to delete {selectedVehicle?.make} {selectedVehicle?.model}?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDeleteConfirmModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </MainContent>
     </div>
   );
 }
 
 export default ViewVehicle;
-
-
-

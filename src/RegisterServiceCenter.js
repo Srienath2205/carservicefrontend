@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  InputAdornment,
   Button,
   Grid,
   Typography,
+  TextField,
+  InputAdornment,
   IconButton,
+  styled,
 } from "@mui/material";
 import {
   FileUpload,
@@ -20,13 +17,13 @@ import {
   Description,
   LocationOn,
   Close,
-  Clear
+  Clear,
 } from "@mui/icons-material";
 import AdminSidebar from "./AdminSidebar";
-import homebackground from "./homebackground.avif";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from "sweetalert2";
 
+// List of districts for validation
 const districts = [
   "madurai", "chennai", "coimbatore", "trichy", "theni", "salem",
   "pondicherry", "erode", "virudhunagar", "dharmapuri", "karur",
@@ -34,11 +31,13 @@ const districts = [
   "villupuram", "rameswaram"
 ];
 
+// Valid file types for uploads
 const validFileTypes = {
   image: ["image/jpeg", "image/png"],
   pdf: ["application/pdf"],
 };
 
+// Function to validate file type
 const validateFile = (file, type) => {
   if (!file) return false;
   if (type === "image" && validFileTypes.image.includes(file.type)) return true;
@@ -46,7 +45,27 @@ const validateFile = (file, type) => {
   return false;
 };
 
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: open ? drawerWidth : 0,
+  flexGrow: 1,
+  padding: '20px',
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: drawerWidth,
+  }),
+}));
+
+const drawerWidth = 240;
+
 const RegisterServiceCenter = () => {
+  const [open, setOpen] = useState(true);
   const [formData, setFormData] = useState({
     serviceCenterName: "",
     address: "",
@@ -71,9 +90,6 @@ const RegisterServiceCenter = () => {
     ownerIdentityProof: Date.now(),
   });
   const [adminDetails, setAdminDetails] = useState({ email: "", contactNumber: "" });
-  const [open, setOpen] = useState(true);
-  const [error, setError] = useState(null);
-
   const navigate = useNavigate();
 
   const loadAdminDetails = useCallback(async () => {
@@ -82,29 +98,17 @@ const RegisterServiceCenter = () => {
       if (Array.isArray(result.data)) {
         const adminID = sessionStorage.getItem("adminID");
         if (adminID) {
-          const admin = result.data.find(
-            (admin) => admin.adminID == adminID
-          );
-
+          const admin = result.data.find(admin => admin.adminID == adminID);
           if (admin) {
             setAdminDetails({
               email: admin.email,
               contactNumber: admin.phoneNumber,
             });
-          } else {
-            console.error("Admin not found.");
-            setError("Admin not found.");
           }
-        } else {
-          setError("Admin ID is missing in session storage.");
         }
-      } else {
-        console.error("Expected an array but got:", result.data);
-        setError("Error fetching admin details.");
       }
     } catch (error) {
       console.error("Error fetching admin details:", error);
-      setError("Error fetching admin details.");
     }
   }, []);
 
@@ -174,53 +178,39 @@ const RegisterServiceCenter = () => {
       formDataToSubmit.append('serviceCenterName', formData.serviceCenterName);
       formDataToSubmit.append('address', formData.address);
       formDataToSubmit.append('description', formData.description);
-  
-      // Extract district from address and append
+
       const addressParts = formData.address.split(",");
       const location = addressParts.length > 1 ? addressParts[1].trim() : "";
       formDataToSubmit.append('location', location);
-      
-      // Append status as 'Pending'
-      formDataToSubmit.append('status', 'Pending');  // Add this line to set the status to 'Pending'
-  
-      // Append files if they exist
+      formDataToSubmit.append('status', 'Pending');
+
       const fileFields = [
         'serviceCenterImage',
         'businessRegistrationCertificate',
         'insuranceDocument',
         'ownerIdentityProof'
       ];
-  
+
       fileFields.forEach(field => {
         if (formData[field]) {
           formDataToSubmit.append(field, formData[field]);
         }
       });
-  
+
       const adminID = sessionStorage.getItem('adminID');
       if (adminID) {
         formDataToSubmit.append('adminID', adminID);
-        // Append admin email and phone number
         formDataToSubmit.append('email', adminDetails.email);
         formDataToSubmit.append('phoneNumber', adminDetails.contactNumber);
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Admin ID Missing',
-          text: 'Admin ID is missing from session storage.',
-        });
-        return;
       }
-  
+
       try {
-        console.log("Hi");
-        console.log(formDataToSubmit);
         const response = await axios.post("http://localhost:8686/servicecenters/add", formDataToSubmit, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-  
+
         if (response.status === 200) {
           Swal.fire({
             icon: 'success',
@@ -239,7 +229,6 @@ const RegisterServiceCenter = () => {
           });
         }
       } catch (error) {
-        console.error('Submission error:', error);
         Swal.fire({
           icon: 'error',
           title: 'Registration Error',
@@ -249,202 +238,197 @@ const RegisterServiceCenter = () => {
     }
   };
 
-  const handleClose = () => {
-    navigate("/admin-dashboard");  // Navigate to the admin dashboard
-  };
-
   const handleCancel = () => {
     navigate("/admin-dashboard");
   };
 
   return (
-    <div
-      style={{
+    <div style={{
+      display: "flex",
+      position: "relative",
+      height: "120vh",
+      backgroundColor: "#f5f5f5", // Remove background image and add a light color
+    }}>
+      <AdminSidebar open={open} />
+      <Main open={open}>
+        <div
+          style={{
+            color: '#03045e',
+            padding: '10px 20px',
+            marginBottom: '20px',
+            textAlign: 'center',
+            fontSize: '24px',
+            fontWeight: 'bold',
+          }}
+        >
+      <div style={{
         display: "flex",
-        position: "relative",
-        height: "100vh",
-        background: `url(${homebackground}) no-repeat center center fixed`,
-        backgroundSize: "cover",
-      }}
-    >
-      <AdminSidebar />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-          <DialogTitle
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.8)", // Reduced opacity
-              padding: "16px", // Ensure there's space around the title
-            }}
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+        width: "100%",
+        maxWidth: "500px", // Set a max width for the form
+        margin: "0 auto",
+        padding: '20px',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)', // Background for form area
+        borderRadius: '8px',
+      }}>
+        <Typography variant="h5" component="div" style={{ marginBottom: "20px", textAlign: 'center' }}>
+          Register Service Center
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={() => navigate("/admin-dashboard")}
+            aria-label="close"
+            style={{ marginLeft: 'auto' }}
           >
-            <Typography variant="h6" component="div" style={{ marginBottom: "20px", display: "flex", alignItems: "center" }}>
-              Register Service Center
-              <IconButton
-                edge="end"
-                color="inherit"
-                onClick={handleClose} // Updated to use handleClose function
-                aria-label="close"
-                style={{ marginLeft: 'auto' }}
-              >
-                <Close />
-              </IconButton>
-            </Typography>
-          </DialogTitle>
-          <DialogContent>
-            <Grid container spacing={3}>
-              {/* Form Fields */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  name="serviceCenterName"
-                  label="Service Center Name"
-                  value={formData.serviceCenterName}
-                  onChange={handleFormChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Store />
-                      </InputAdornment>
-                    ),
-                  }}
-                  error={!!formErrors.serviceCenterName}
-                  helperText={formErrors.serviceCenterName}
-                  style={{ marginTop: "20px" }}  // Add space above
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  name="address"
-                  label="Address"
-                  value={formData.address}
-                  onChange={handleFormChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LocationOn />
-                      </InputAdornment>
-                    ),
-                  }}
-                  error={!!formErrors.address}
-                  helperText={formErrors.address}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  name="description"
-                  label="Description"
-                  value={formData.description}
-                  onChange={handleFormChange}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Description />
-                      </InputAdornment>
-                    ),
-                  }}
-                  error={!!formErrors.description}
-                  helperText={formErrors.description}
-                />
-              </Grid>
-              {/* Admin Details */}
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  value={adminDetails.email}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Email />
-                      </InputAdornment>
-                    ),
-                    readOnly: true,
-                  }}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Phone Number"
-                  value={adminDetails.contactNumber}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Phone />
-                      </InputAdornment>
-                    ),
-                    readOnly: true,
-                  }}
-                  variant="outlined"
-                />
-              </Grid>
-              {/* File Inputs */}
-              {[ 
-                { name: 'serviceCenterImage', label: 'Service Center Image', accept: 'image/*' },
-                { name: 'businessRegistrationCertificate', label: 'Business Registration Certificate', accept: '.pdf' },
-                { name: 'insuranceDocument', label: 'Insurance Document', accept: '.pdf' },
-                { name: 'ownerIdentityProof', label: 'Owner Identity Proof', accept: 'image/*' }
-              ].map((field) => (
-                <Grid item xs={12} key={field.name}>
-                  <Typography variant="body1" gutterBottom>
-                    {field.label}
-                  </Typography>
-                  <input
-                    key={fileInputKeys[field.name]}
-                    type="file"
-                    name={field.name}
-                    onChange={handleFormChange}
-                    accept={field.accept}
-                    style={{ display: 'none' }}
-                  />
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: 'green', color: 'white' }}
-                    component="label"
-                    onClick={() => document.querySelector(`input[name="${field.name}"]`).click()}
-                  >
-                    <FileUpload />
-                    {fileNames[field.name]}
-                  </Button>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleClearFile(field.name)}
-                    aria-label="clear"
-                  >
-                    <Clear />
-                  </IconButton>
-                  {formErrors[field.name] && <Typography color="error">{formErrors[field.name]}</Typography>}
-                </Grid>
-              ))}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-            <Button
+            <Close />
+          </IconButton>
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              name="serviceCenterName"
+              label="Service Center Name"
+              value={formData.serviceCenterName}
+              onChange={handleFormChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Store style={{ color: 'blue' }} /> {/* Colorful icon */}
+                  </InputAdornment>
+                ),
+              }}
+              error={!!formErrors.serviceCenterName}
+              helperText={formErrors.serviceCenterName}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              name="address"
+              label="Address"
+              value={formData.address}
+              onChange={handleFormChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LocationOn style={{ color: 'orange' }} /> {/* Colorful icon */}
+                  </InputAdornment>
+                ),
+              }}
+              error={!!formErrors.address}
+              helperText={formErrors.address}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              name="description"
+              label="Description"
+              value={formData.description}
+              onChange={handleFormChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Description style={{ color: 'green' }} /> {/* Colorful icon */}
+                  </InputAdornment>
+                ),
+              }}
+              error={!!formErrors.description}
+              helperText={formErrors.description}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Email"
+              value={adminDetails.email}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email style={{ color: 'purple' }} /> {/* Colorful icon */}
+                  </InputAdornment>
+                ),
+                readOnly: true,
+              }}
               variant="outlined"
-              style={{ color: 'white', backgroundColor: 'red' }}
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Phone Number"
+              value={adminDetails.contactNumber}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Phone style={{ color: 'red' }} /> {/* Colorful icon */}
+                  </InputAdornment>
+                ),
+                readOnly: true,
+              }}
+              variant="outlined"
+            />
+          </Grid>
+          {[ 
+            { name: 'serviceCenterImage', label: 'Service Center Image', accept: 'image/*' },
+            { name: 'businessRegistrationCertificate', label: 'Business Registration Certificate', accept: '.pdf' },
+            { name: 'insuranceDocument', label: 'Insurance Document', accept: '.pdf' },
+            { name: 'ownerIdentityProof', label: 'Owner Identity Proof', accept: 'image/*' }
+          ].map((field) => (
+            <Grid item xs={12} key={field.name}>
+              <Typography variant="body1" gutterBottom>
+                {field.label}
+              </Typography>
+              <input
+                key={fileInputKeys[field.name]}
+                type="file"
+                name={field.name}
+                onChange={handleFormChange}
+                accept={field.accept}
+                style={{ display: 'none' }}
+              />
+              <Button
+                variant="contained"
+                style={{ backgroundColor: 'green', color: 'white' }}
+                component="label"
+                onClick={() => document.querySelector(`input[name="${field.name}"]`).click()}
+              >
+                <FileUpload />
+                {fileNames[field.name]}
+              </Button>
+              <IconButton
+                color="error"
+                onClick={() => handleClearFile(field.name)}
+                aria-label="clear"
+              >
+                <Clear />
+              </IconButton>
+              {formErrors[field.name] && <Typography color="error">{formErrors[field.name]}</Typography>}
+            </Grid>
+          ))}
+        </Grid>
+        <div style={{ marginTop: '20px' }}>
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ color: 'white', backgroundColor: 'red', marginLeft: '10px' }}
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
+        </div>
       </div>
+      </div>
+      </Main>
     </div>
   );
 };
 
 export default RegisterServiceCenter;
+
+

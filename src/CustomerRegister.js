@@ -25,7 +25,7 @@ export default function CustomerRegister() {
     email: "",
     password: "",
     phoneNumber: "",
-    address: "", // Added address field
+    address: "",
   });
 
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ export default function CustomerRegister() {
         Swal.fire({
           icon: "error",
           title: "Registration Error",
-          text: "An error occurred while registering. Please try again later.",
+          text: err.response?.data || "An error occurred while registering. Please try again later.",
         });
       }
     }

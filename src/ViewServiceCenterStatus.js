@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -26,29 +25,28 @@ import {
 import {
   Dashboard,
 } from "@mui/icons-material";
-import { Visibility, Download, PictureAsPdf, Image } from '@mui/icons-material';
+import { Visibility, Download, PictureAsPdf } from '@mui/icons-material';
 import AdminSidebar from './AdminSidebar';
-import homebackground from "./homebackground.avif";
 
 // Styled components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   color: theme.palette.text.primary,
   borderBottom: `1px solid ${theme.palette.divider}`,
-  textAlign: 'center', // Center text contents
+  textAlign: 'center',
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: '#f0f8ff', // Light faded blue
+    backgroundColor: '#f0f8ff',
   },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
   marginLeft: theme.spacing(2),
-  backgroundColor: '#009688', // Blue-green color
+  backgroundColor: '#009688',
   color: 'white',
   '&:hover': {
-    backgroundColor: '#00796b', // Darker shade for hover
+    backgroundColor: '#00796b',
   },
 }));
 
@@ -67,22 +65,22 @@ const DialogTitleStyled = styled(DialogTitle)(({ theme }) => ({
   color: 'white',
 }));
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open }) => ({
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: open ? drawerWidth : 0,
+  flexGrow: 1,
+  padding: '20px',
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
-  })
-);
+    marginLeft: drawerWidth,
+  }),
+}));
 
 const drawerWidth = 240;
 
@@ -94,16 +92,17 @@ const ViewServiceCenterStatus = () => {
   const [selectedCenter, setSelectedCenter] = useState(null);
   const [fileUrls, setFileUrls] = useState({});
   const [viewFile, setViewFile] = useState(null);
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const adminID = queryParams.get('adminID');
+
+  // Retrieve adminID from session storage
+  const adminID = sessionStorage.getItem('adminID');
   const theme = useTheme();
 
   useEffect(() => {
     const fetchServiceCenters = async () => {
       try {
         const result = await axios.get("http://localhost:8686/servicecenters/all");
-        const filteredCenters = result.data.filter(center => center.adminID == adminID);
+        // Filter based on adminID from session storage
+        const filteredCenters = result.data.filter(center => center.admin.adminID == adminID);
         setServiceCenters(filteredCenters);
       } catch (error) {
         console.error('Error fetching service centers:', error);
@@ -154,70 +153,74 @@ const ViewServiceCenterStatus = () => {
   return (
     <div
       style={{
-        display: "flex",
-        position: "relative",
-        height: "140vh",
-        background: `url(${homebackground}) no-repeat center center fixed`,
-        backgroundSize: "cover",
+        color: "#03045e",
+        padding: "10px 20px",
+        marginBottom: "20px",
+        textAlign: "center",
+        fontSize: "24px",
+        fontWeight: "bold",
       }}
     >
       <AdminSidebar open={open} />
-      <Main open={openViewFiles} style={{ flexGrow: 1, padding: "20px" }}>
-        {/* Title Section */}
+      <Main open={open}>
         <div
           style={{
-            color: "#fff",
-            padding: "10px 20px",
-            marginBottom: "20px",
-            textAlign: "center",
-            fontSize: "24px",
-            fontWeight: "bold",
+            color: '#03045e',
+            padding: '10px 20px',
+            marginBottom: '20px',
+            textAlign: 'center',
+            fontSize: '24px',
+            fontWeight: 'bold',
           }}
         >
           <Dashboard style={{ verticalAlign: "middle", marginRight: "8px" }} />
           Service Center
         </div>
-        <Box sx={{ display: 'flex', marginLeft: '15rem' }}>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Name</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Address</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Description</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Location</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Status</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Approval Date</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Rating</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Email</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Phone Number</StyledTableCell>
-                  <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Actions</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {serviceCenters.map((center) => (
-                  <StyledTableRow key={center.serviceCenterID}>
-                    <StyledTableCell>{center.serviceCenterName}</StyledTableCell>
-                    <StyledTableCell>{center.address}</StyledTableCell>
-                    <StyledTableCell>{center.description}</StyledTableCell>
-                    <StyledTableCell>{center.location}</StyledTableCell>
-                    <StyledTableCell>{center.status}</StyledTableCell>
-                    <StyledTableCell>{center.approvalDate ? new Date(center.approvalDate).toLocaleDateString() : 'N/A'}</StyledTableCell>
-                    <StyledTableCell>{center.rating}</StyledTableCell>
-                    <StyledTableCell>{center.email}</StyledTableCell>
-                    <StyledTableCell>{center.phoneNumber}</StyledTableCell>
-                    <StyledTableCell>
-                      <Tooltip title="View Files">
-                        <IconButton onClick={() => handleOpenViewFiles(center)}>
-                          <Visibility />
-                        </IconButton>
-                      </Tooltip>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {serviceCenters.length === 0 ? (
+            <Typography color="#03045e" variant="h6">
+              Center has not been Registered yet.
+            </Typography>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Name</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Address</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Description</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Location</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Status</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Approval Date</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Email</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Phone Number</StyledTableCell>
+                    <StyledTableCell style={{ backgroundColor: '#03045e', color: 'white' }}>Actions</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {serviceCenters.map((center) => (
+                    <StyledTableRow key={center.serviceCenterID}>
+                      <StyledTableCell>{center.serviceCenterName}</StyledTableCell>
+                      <StyledTableCell>{center.address}</StyledTableCell>
+                      <StyledTableCell>{center.description}</StyledTableCell>
+                      <StyledTableCell>{center.location}</StyledTableCell>
+                      <StyledTableCell>{center.status}</StyledTableCell>
+                      <StyledTableCell>{center.approvalDate ? new Date(center.approvalDate).toLocaleDateString() : 'N/A'}</StyledTableCell>
+                      <StyledTableCell>{center.email}</StyledTableCell>
+                      <StyledTableCell>{center.phoneNumber}</StyledTableCell>
+                      <StyledTableCell>
+                        <Tooltip title="View Files">
+                          <IconButton onClick={() => handleOpenViewFiles(center)}>
+                            <Visibility />
+                          </IconButton>
+                        </Tooltip>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
 
           {/* Main Dialog for file actions */}
           <Dialog open={openViewFiles} onClose={handleClose} maxWidth="md" fullWidth>
@@ -327,7 +330,6 @@ const ViewServiceCenterStatus = () => {
                         </CenteredBox>
                       </Grid>
                     )}
-                    
                   </Grid>
                 </div>
               )}

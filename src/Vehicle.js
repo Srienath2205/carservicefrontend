@@ -21,9 +21,8 @@ import {
   Description as DescriptionIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import CustomerSideBar from "./CustomerSideBar"; // Import CustomerSidebar
+import CustomerSideBar from "./CustomerSideBar";
 
-// Custom styled components
 const GradientButton = styled(Button)(({ theme }) => ({
   background: "linear-gradient(45deg, #C33764, #1D2671)",
   color: "#fff",
@@ -33,10 +32,10 @@ const GradientButton = styled(Button)(({ theme }) => ({
 }));
 
 const BlueButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "#007bff", // Bootstrap blue color
+  backgroundColor: "#007bff",
   color: "#fff",
   "&:hover": {
-    backgroundColor: "#0056b3", // Bootstrap dark blue color for hover
+    backgroundColor: "#0056b3",
   },
 }));
 
@@ -92,10 +91,8 @@ const Vehicle = () => {
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const [editMode, setEditMode] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch customerID from session storage
   const customerID = sessionStorage.getItem("customerID");
 
   useEffect(() => {
@@ -107,7 +104,6 @@ const Vehicle = () => {
 
   const handleAddVehicle = () => {
     setShowAddForm(true);
-    setEditMode(false);
   };
 
   const handleCancelAdd = () => {
@@ -147,24 +143,24 @@ const Vehicle = () => {
     if (!newVehicle.vin.trim()) {
       errors.vin = "VIN is required.";
       isValid = false;
+    } else if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(newVehicle.vin)) {
+      errors.vin = "VIN must be 17 characters long, excluding I, O, Q.";
+      isValid = false;
     }
 
-    if (
-      newVehicle.vehicleImage &&
-      !["image/png", "image/jpeg"].includes(newVehicle.vehicleImage.type)
-    ) {
+    if (!newVehicle.vehicleImage) {
+      errors.vehicleImage = "Vehicle image is required.";
+      isValid = false;
+    } else if (!["image/png", "image/jpeg"].includes(newVehicle.vehicleImage.type)) {
       errors.vehicleImage = "Vehicle image must be PNG or JPEG.";
       isValid = false;
     }
 
-    if (
-      newVehicle.registrationCertificate &&
-      !["application/pdf", "image/png", "image/jpeg"].includes(
-        newVehicle.registrationCertificate.type
-      )
-    ) {
-      errors.registrationCertificate =
-        "Registration certificate must be PDF, PNG, or JPEG.";
+    if (!newVehicle.registrationCertificate) {
+      errors.registrationCertificate = "Registration certificate is required.";
+      isValid = false;
+    } else if (!["application/pdf", "image/png", "image/jpeg"].includes(newVehicle.registrationCertificate.type)) {
+      errors.registrationCertificate = "Registration certificate must be PDF, PNG, or JPEG.";
       isValid = false;
     }
 
@@ -202,14 +198,9 @@ const Vehicle = () => {
     formData.append("model", newVehicle.model);
     formData.append("year", newVehicle.year);
     formData.append("vin", newVehicle.vin);
-    formData.append("customerID", customerID); // Add customerID to FormData
-    if (newVehicle.vehicleImage)
-      formData.append("vehicleImage", newVehicle.vehicleImage);
-    if (newVehicle.registrationCertificate)
-      formData.append(
-        "registrationCertificate",
-        newVehicle.registrationCertificate
-      );
+    formData.append("customerID", customerID);
+    if (newVehicle.vehicleImage) formData.append("vehicleImage", newVehicle.vehicleImage);
+    if (newVehicle.registrationCertificate) formData.append("registrationCertificate", newVehicle.registrationCertificate);
 
     axios
       .post("http://localhost:8686/vehicle/add", formData, {
@@ -228,7 +219,6 @@ const Vehicle = () => {
           timer: 3000,
           showConfirmButton: false,
         }).then(() => {
-          console.log("Hi");
           navigate("/view-vehicle");
         });
       })
@@ -261,23 +251,12 @@ const Vehicle = () => {
           </Box>
 
           {showAddForm && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                mt: 4,
-                mb: 4,
-              }}
-            >
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 4, mb: 4 }}>
               <GradientCard sx={{ maxWidth: 800, width: "100%" }}>
                 <CardContent>
                   <form onSubmit={handleAddVehicleSubmit}>
                     <FormControl fullWidth margin="normal">
-                      <Typography
-                        variant="body1"
-                        sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}
-                      >
+                      <Typography variant="body1" sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}>
                         Make
                       </Typography>
                       <StyledTextField
@@ -289,10 +268,7 @@ const Vehicle = () => {
                       />
                     </FormControl>
                     <FormControl fullWidth margin="normal">
-                      <Typography
-                        variant="body1"
-                        sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}
-                      >
+                      <Typography variant="body1" sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}>
                         Model
                       </Typography>
                       <StyledTextField
@@ -304,10 +280,7 @@ const Vehicle = () => {
                       />
                     </FormControl>
                     <FormControl fullWidth margin="normal">
-                      <Typography
-                        variant="body1"
-                        sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}
-                      >
+                      <Typography variant="body1" sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}>
                         Year
                       </Typography>
                       <StyledTextField
@@ -320,10 +293,7 @@ const Vehicle = () => {
                       />
                     </FormControl>
                     <FormControl fullWidth margin="normal">
-                      <Typography
-                        variant="body1"
-                        sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}
-                      >
+                      <Typography variant="body1" sx={{ mb: 1, color: "#fff", fontWeight: "bold" }}>
                         VIN
                       </Typography>
                       <StyledTextField
@@ -334,7 +304,7 @@ const Vehicle = () => {
                         helperText={validationErrors.vin}
                       />
                     </FormControl>
-                    <FormControl fullWidth margin="normal">
+                    <FormControl fullWidth margin="normal" sx={{ backgroundColor: "#fff", borderRadius: "8px", padding: "8px" }}>
                       <Button
                         variant="contained"
                         component="label"
@@ -355,19 +325,12 @@ const Vehicle = () => {
                         />
                       </Button>
                       {newVehicle.vehicleImageName && (
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", mt: 1 }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ color: "#fff", mr: 1 }}
-                          >
+                        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: "#000", mr: 1 }}>
                             {newVehicle.vehicleImageName}
                           </Typography>
-                          <IconButton
-                            onClick={() => handleClearFile("vehicleImage")}
-                          >
-                            <CloseIcon sx={{ color: "#fff" }} />
+                          <IconButton onClick={() => handleClearFile("vehicleImage")}>
+                            <CloseIcon sx={{ color: "#000" }} />
                           </IconButton>
                         </Box>
                       )}
@@ -377,7 +340,7 @@ const Vehicle = () => {
                         </FormHelperText>
                       )}
                     </FormControl>
-                    <FormControl fullWidth margin="normal">
+                    <FormControl fullWidth margin="normal" sx={{ backgroundColor: "#fff", borderRadius: "8px", padding: "8px" }}>
                       <Button
                         variant="contained"
                         component="label"
@@ -398,21 +361,12 @@ const Vehicle = () => {
                         />
                       </Button>
                       {newVehicle.registrationCertificateName && (
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", mt: 1 }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ color: "#fff", mr: 1 }}
-                          >
+                        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                          <Typography variant="body2" sx={{ color: "#000", mr: 1 }}>
                             {newVehicle.registrationCertificateName}
                           </Typography>
-                          <IconButton
-                            onClick={() =>
-                              handleClearFile("registrationCertificate")
-                            }
-                          >
-                            <CloseIcon sx={{ color: "#fff" }} />
+                          <IconButton onClick={() => handleClearFile("registrationCertificate")}>
+                            <CloseIcon sx={{ color: "#000" }} />
                           </IconButton>
                         </Box>
                       )}
@@ -424,7 +378,7 @@ const Vehicle = () => {
                     </FormControl>
                     <Box sx={{ mt: 2 }}>
                       <BlueButton type="submit">
-                        {editMode ? "Update Vehicle" : "Add Vehicle"}
+                        Add Vehicle
                       </BlueButton>
                       <Button
                         variant="outlined"
